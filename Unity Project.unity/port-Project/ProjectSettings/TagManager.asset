@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Enemy
+  - MedKit
+  - ShopObj
+  - ShopTxt
+  - InteractiveObj
+  - SaveZone
+  - keycardInv
+  - Computer
+  - pipes
+  - CompTxt
+  - Fire
+  - Electric
+  - Acid
+  - Music
+  - Pistol
+  - Bullpup
+  - Carbine
+  - CompactCharger
+  - Compensator
+  - DrumPDW
+  - AR
+  - Shotgun
+  - Handgun
+  - MicroSMG
+  - RevRifle
+  - Sniper
+  - SnubRevolver
+  - Suppressor
+  - Willy
+  - WristBreaker
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - Enemy
+  - Water
+  - UI
+  - Weapon
+  - Interact
+  - SaveZone
+  - Objective
+  - PostProcessing
+  - Collectibles
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
