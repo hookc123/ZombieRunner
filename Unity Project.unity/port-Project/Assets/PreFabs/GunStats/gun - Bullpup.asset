@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df92cbc09479744468f1696b9293179d, type: 3}
+  m_Name: gun - Bullpup
+  m_EditorClassIdentifier: 
+  gunModel: {fileID: 6576053810601946475, guid: faf47b596475efc4c839fb44dd61adee, type: 3}
+  gunID: 1
+  shootDmg: 3
+  shootDist: 175
+  shootRate: 0.25
+  ammoCurr: 30
+  ammoMax: 360
+  magazineSize: 30
+  gunMaterials: []
+  muzzleFlashPositionOffset: {x: 0, y: -0.0357, z: 0.0044}
+  muzzleFlashRotationOffset: {x: 88.482, y: 0, z: 0}
+  hitEffect: {fileID: 3787883669079084488, guid: 07453ca3f5909fb4f9301cf0cd58004f, type: 3}
+  enemyHitEffect: {fileID: 2618032244679568243, guid: 5a62e2fffa188a74cbc72db78f2b6b5f, type: 3}
+  shootSound: {fileID: 8300000, guid: 3655c766cb1d1f648aeb8e1075adafc0, type: 3}
+  shootVol: 0.5
