@@ -1,8 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Utilities;
 
 
 
@@ -45,7 +48,7 @@ public class PlayerController : MonoBehaviour, IDamage, IKnockbackable, IElement
     [SerializeField] AudioClip acidSword;
 
     [SerializeField] public GameObject loadingIcon;
-    public GameObject[]playerCollecibles;
+    public GameObject[] playerCollecibles;
     [SerializeField] gunStats[] guns;
     [SerializeField] SwordStats[] swords;
     [SerializeField] public GameObject damageIndicatorPrefab;
@@ -94,8 +97,10 @@ public class PlayerController : MonoBehaviour, IDamage, IKnockbackable, IElement
     void Awake()
     {
         playerControls = new PlayerControls();
-        instance= this;
-        
+        instance = this;
+        var trace = new InputActionTrace();
+        trace.SubscribeToAll();
+
     }
 
     private void OnEnable()
@@ -126,10 +131,10 @@ public class PlayerController : MonoBehaviour, IDamage, IKnockbackable, IElement
     {
         playerCollecibles = CollectibleManager.instance.collectibleArr;
         playerControls = new PlayerControls();
-        money=gameManager.instance.points;
+        money = gameManager.instance.points;
         HP = gameManager.instance.saveSystem.LoadHP();
         HPorig = 100;
-        Debug.Log("Player HP: " + HP);
+        UnityEngine.Debug.Log("Player HP: " + HP);
         updatePlayerUI();
         LoadGuns();
         gunList[selectedGun].ammoCurr = magazineSize;
@@ -148,7 +153,7 @@ public class PlayerController : MonoBehaviour, IDamage, IKnockbackable, IElement
     {
         if (!gameManager.instance.isPaused)
         {
-            Debug.DrawRay(Camera.main.transform.position, Camera.main.transform.forward * shootDistance, Color.red);
+            UnityEngine.Debug.DrawRay(Camera.main.transform.position, Camera.main.transform.forward * shootDistance, Color.red);
             movement();
             if (Input.GetButton("Fire1") && gunList.Count > 0 && gunList[selectedGun].ammoCurr > 0 && isShooting == false && !isReloading)
             {
@@ -165,13 +170,13 @@ public class PlayerController : MonoBehaviour, IDamage, IKnockbackable, IElement
             if (Input.GetButton("Reload") && isReloading == false && !gameManager.instance.isPaused)
             {
                 StartCoroutine(reload());
-               
+
             }
             if (Input.GetButtonDown("Aim") || Input.GetButtonUp("Aim"))
             {
                 StartCoroutine(ADS());
                 StartCoroutine(DisableADS());
-            }  
+            }
             if (Input.GetButtonDown("Sprint") || Input.GetButtonUp("Sprint"))
             {
                 sprint();
@@ -187,12 +192,12 @@ public class PlayerController : MonoBehaviour, IDamage, IKnockbackable, IElement
             StartCoroutine(loadIcon());
             SaveGuns(); // Save guns
             gameManager.instance.saveSystem.SavePoints(gameManager.instance.points);
-            Debug.Log("Game Saved");
+            UnityEngine.Debug.Log("Game Saved");
         }
         if (Input.GetKeyDown(KeyCode.P))
         {
             gameManager.instance.saveSystem.delete();
-            Debug.Log("Save Deleted");
+            UnityEngine.Debug.Log("Save Deleted");
         }
     }
 
@@ -212,10 +217,19 @@ public class PlayerController : MonoBehaviour, IDamage, IKnockbackable, IElement
 
 
     }
-
     void OnJump(InputAction.CallbackContext context)
     {
-        jump();
+        playerControls.Player.Jump.performed +=
+    ctx =>
+{
+    if (ctx.ReadValue<float>() > 0.5f) { }
+        //trace.RecordAction(ctx);
+};
+        UnityEngine.Debug.Log("Jump");
+        AudioManager.instance.jumpSound();
+        jumpCount++;
+        playerVel.y = jumpSpeed;
+        //jump();
     }
 
     void OnCrouch(InputAction.CallbackContext context)
@@ -240,15 +254,18 @@ public class PlayerController : MonoBehaviour, IDamage, IKnockbackable, IElement
             playerVel = Vector3.zero;
         }
 
-
-        moveDir = Input.GetAxis("Horizontal") * transform.right + Input.GetAxis("Vertical") * transform.forward;
+        Vector3 movementInput = playerControls.Player.Movement.ReadValue<Vector2>();
+        Vector3 moveDir = movementInput.x * transform.right + movementInput.y * transform.forward;
+        //moveDir = Input.GetAxis("Horizontal") * transform.right + Input.GetAxis("Vertical") * transform.forward;
         charController.Move(moveDir * speed * Time.deltaTime);
-        if (Input.GetButtonDown("Jump") && jumpCount < jumpMax)
-        {
-            AudioManager.instance.jumpSound();
-            jumpCount++;
-            playerVel.y = jumpSpeed;
-        }
+
+        //if (Input.GetButton("jump") && jumpCount < jumpMax)
+        //{
+        //    AudioManager.instance.jumpSound();
+        //    jumpCount++;
+        //    playerVel.y = jumpSpeed;
+        //}
+
 
         playerVel.y -= gravity * 3 * Time.deltaTime;
         charController.Move((playerVel) * Time.deltaTime);
@@ -283,7 +300,7 @@ public class PlayerController : MonoBehaviour, IDamage, IKnockbackable, IElement
 
     void jump()
     {
-        if (charController.isGrounded && jumpCount < jumpMax)
+        //if (charController.isGrounded && jumpCount < jumpMax)
         {
             AudioManager.instance.jumpSound();
             jumpCount++;
@@ -651,7 +668,7 @@ public class PlayerController : MonoBehaviour, IDamage, IKnockbackable, IElement
                             armModel.GetComponent<Animator>().Play("WristBreaker_Idle");
                             break;
                         }
-                   
+
                     default:
                         {
                             break;
@@ -663,7 +680,7 @@ public class PlayerController : MonoBehaviour, IDamage, IKnockbackable, IElement
         else
         {
             StartCoroutine(AudioManager.instance.gunEmpty(gunAud, shootRate));
-            Debug.Log("Out of Ammo!");
+            UnityEngine.Debug.Log("Out of Ammo!");
         }
     }
 
@@ -726,7 +743,7 @@ public class PlayerController : MonoBehaviour, IDamage, IKnockbackable, IElement
                             Camera.main.fieldOfView = 20;
                         }
                         break;
-                    } 
+                    }
                 case "Sniper":
                     {
                         armModel.GetComponent<Animator>().Play("ADS_Sniper");
@@ -827,7 +844,7 @@ public class PlayerController : MonoBehaviour, IDamage, IKnockbackable, IElement
                         yield return new WaitForSeconds(0.2f);
                         armModel.GetComponent<Animator>().Play("ADS_Suppressor_Idle");
                         break;
-                    }         
+                    }
                 case "Willy":
                     {
                         armModel.GetComponent<Animator>().Play("ADS_WillySlapper");
@@ -1015,11 +1032,11 @@ public class PlayerController : MonoBehaviour, IDamage, IKnockbackable, IElement
 
                 case "Pistol":
                     {
-                        Debug.Log("Animation Started");
+                        UnityEngine.Debug.Log("Animation Started");
                         armModel.GetComponent<Animator>().Play("Pistol_Reload");
                         yield return new WaitForSeconds(2);
                         armModel.GetComponent<Animator>().Play("Pistol_Idle");
-                        Debug.Log("Animation Started");
+                        UnityEngine.Debug.Log("Animation Started");
                         break;
                     }
 
@@ -1167,7 +1184,7 @@ public class PlayerController : MonoBehaviour, IDamage, IKnockbackable, IElement
         {
             if (isAiming)
             {
-               isAiming = false;
+                isAiming = false;
             }
 
             MeshRenderer gunMeshRenderer = gunModel.GetComponent<MeshRenderer>();
@@ -1341,7 +1358,7 @@ public class PlayerController : MonoBehaviour, IDamage, IKnockbackable, IElement
     public IEnumerator reload()
     {
         isReloading = true;
-        Debug.Log("Reloading");
+        UnityEngine.Debug.Log("Reloading");
         AudioManager.instance.reloadSound(gunAud);
         yield return StartCoroutine(ReloadAnim());
         int ammoToReload = Mathf.Min(magazineSize, stockAmmo);
@@ -1725,7 +1742,7 @@ public class PlayerController : MonoBehaviour, IDamage, IKnockbackable, IElement
             SaveGuns();
             gameManager.instance.saveSystem.SavePoints(gameManager.instance.points);
             //SaveSystem.instance.saveCollectibles();
-            Debug.Log("Game Saved in SaveZone");
+            UnityEngine.Debug.Log("Game Saved in SaveZone");
             StartCoroutine(loadIcon());
         }
     }
@@ -1758,7 +1775,7 @@ public class PlayerController : MonoBehaviour, IDamage, IKnockbackable, IElement
         float knockbackDuration = 0.5f;
         float knockbackDistance = 3f;
         Vector3 knockBackDir = other.transform.forward;//gets direction of the enemy to apply to the player
-        Vector3 targetPosition = transform.position+knockBackDir * knockbackDistance;
+        Vector3 targetPosition = transform.position + knockBackDir * knockbackDistance;
 
         StartCoroutine(ApplyKnockback(transform, targetPosition, knockbackDuration, force));
     }
